@@ -1,6 +1,6 @@
 # Dicasa Analytics API
 
-![Dicasa Logo](https://i.imgur.com/O8bS3bB.png)
+![Dicasa Logo](https://dicasagroup.netlify.app/assets/images/dicasa-500x500.png)
 
 [![Build Status](https://img.shields.io/travis/com/your-username/dicasa-analytics.svg?style=flat-square)](https://travis-ci.com/your-username/dicasa-analytics)
 [![Coverage Status](https://img.shields.io/coveralls/github/your-username/dicasa-analytics.svg?style=flat-square)](https://coveralls.io/github/your-username/dicasa-analytics)
