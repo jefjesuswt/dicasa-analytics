@@ -11,6 +11,9 @@ export class ConnectionLog extends Document {
 
   @Prop()
   ip?: string;
+
+  @Prop({ type: Date, default: Date.now, expires: 2592000 })
+  createdAt: Date;
 }
 
 export const ConnectionLogSchema = SchemaFactory.createForClass(ConnectionLog);
