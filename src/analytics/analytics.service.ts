@@ -1,13 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { CreateVisitDto } from './dto/create-visit.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { StartSessionDto } from './dto/start-session.dto';
-import { HeartbeatDto } from './dto/heartbeat.dto';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import {
   Appointment,
   AppointmentStatus,
+  AuditLog,
   ConnectionLog,
   SecurityAlert,
   Session,
@@ -15,6 +13,12 @@ import {
 } from './entities';
 import { PermanenceMetrics } from './interfaces/permanence.interface';
 import { SchedulingRateMetrics } from './interfaces';
+import {
+  CreateAuditLogDto,
+  CreateVisitDto,
+  HeartbeatDto,
+  StartSessionDto,
+} from './dto';
 
 @Injectable()
 export class AnalyticsService {
@@ -23,11 +27,14 @@ export class AnalyticsService {
   constructor(
     @InjectModel(Visit.name) private visitModel: Model<Visit>,
     @InjectModel(Session.name) private sessionModel: Model<Session>,
+    @InjectModel(AuditLog.name) private auditModel: Model<AuditLog>,
     @InjectModel(Appointment.name) private appointmentModel: Model<Appointment>,
     @InjectModel(SecurityAlert.name) private alertModel: Model<SecurityAlert>,
     @InjectModel(ConnectionLog.name)
     private connectionLogModel: Model<ConnectionLog>,
   ) {}
+
+  // VISITAS
 
   async createVisit(createVisitDto: CreateVisitDto): Promise<Visit> {
     const today = new Date().toISOString().split('T')[0];
@@ -98,6 +105,8 @@ export class AnalyticsService {
     return { status: 'ok' };
   }
 
+  // PERMANENCIA
+
   async getPermanenceMetrics(): Promise<PermanenceMetrics> {
     const pipeline = [
       {
@@ -138,7 +147,7 @@ export class AnalyticsService {
     return result[0];
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_10_MINUTES)
   async handleSessionDurationProcessing() {
     this.logger.log('Running Session Duration Processing Job...');
 
@@ -173,6 +182,8 @@ export class AnalyticsService {
     this.logger.log('Successfully processed session durations.');
   }
 
+  // CIFRADO
+
   async getCipherMetrics() {
     // 2. Contar éxitos
     const encryptedRequests = await this.connectionLogModel.countDocuments();
@@ -193,6 +204,15 @@ export class AnalyticsService {
       porcentaje_cumplimiento: `${percentage.toFixed(2)}%`,
     };
   }
+
+  // AUTENTICACION
+
+  async createAuditLog(dto: CreateAuditLogDto): Promise<AuditLog> {
+    const newLog = new this.auditModel(dto);
+    return newLog.save();
+  }
+
+  // AGENDAMIENTO
 
   async getSchedulingRate(): Promise<SchedulingRateMetrics> {
     const tsCount = await this.appointmentModel.countDocuments({

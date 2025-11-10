@@ -8,21 +8,33 @@ import {
   Query,
 } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
-import { CreateVisitDto } from './dto/create-visit.dto';
-import { Visit } from './entities/visit.entity';
-import { StartSessionDto } from './dto/start-session.dto';
-import { HeartbeatDto } from './dto/heartbeat.dto';
 import { SchedulingRateMetrics } from './interfaces';
+import {
+  CreateAuditLogDto,
+  CreateVisitDto,
+  HeartbeatDto,
+  StartSessionDto,
+} from './dto';
+import { Visit } from './entities';
 
 @Controller('analytics')
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
+
+  // VISITAS
 
   @Post('visit')
   async createVisit(@Body() createVisitDto: CreateVisitDto): Promise<Visit> {
     console.log(createVisitDto);
     return this.analyticsService.createVisit(createVisitDto);
   }
+
+  @Get('visits')
+  async getVisits(): Promise<number> {
+    return this.analyticsService.getVisitCount();
+  }
+
+  // PERMANENCIA
 
   @Post('session/start')
   startSession(@Body() startSessionDto: StartSessionDto) {
@@ -43,19 +55,26 @@ export class AnalyticsController {
     return this.analyticsService.getPermanenceMetrics();
   }
 
+  // CIFRADO
+
   @Get('metrics/cipher')
   getCipherMetrics() {
     return this.analyticsService.getCipherMetrics();
   }
 
+  @Post('audit')
+  createAuditLog(@Body() dto: CreateAuditLogDto) {
+    this.analyticsService.createAuditLog(dto).catch((err) => {
+      console.error('Error logging audit:', err);
+    });
+    return { status: 'received' };
+  }
+
+  // AUTENTICACION
+
   @Get('metrics/scheduling-rate')
   getSchedulingRate(): Promise<SchedulingRateMetrics> {
     return this.analyticsService.getSchedulingRate();
-  }
-
-  @Get('visits')
-  async getVisits(): Promise<number> {
-    return this.analyticsService.getVisitCount();
   }
 
   @Get('visits/count/by-day')
