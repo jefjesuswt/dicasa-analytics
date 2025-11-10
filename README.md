@@ -2,10 +2,6 @@
 
 <img src="https://dicasagroup.netlify.app/assets/images/dicasa-500x500.png" alt="Dicasa Group Logo" width="100" height="100">
 
-[![Build Status](https://img.shields.io/travis/com/your-username/dicasa-analytics.svg?style=flat-square)](https://travis-ci.com/your-username/dicasa-analytics)
-[![Coverage Status](https://img.shields.io/coveralls/github/your-username/dicasa-analytics.svg?style=flat-square)](https://coveralls.io/github/your-username/dicasa-analytics)
-[![License: MIT](httpshttps://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-
 ## Introduction
 
 Dicasa Analytics is a robust backend service built with NestJS, designed to provide insightful analytics for the Dicasa real estate platform. It tracks user engagement, monitors security, and delivers key performance indicators (KPIs) to help optimize the user experience and business strategy.
