@@ -15,6 +15,10 @@ export class ConnectionAuditMiddleware implements NestMiddleware {
   ) {}
 
   use(req: Request, res: Response, next: NextFunction) {
+    if (req.originalUrl === '/') {
+      return next();
+    }
+
     const protocol = req.headers['x-forwarded-proto'];
 
     if (protocol === 'http') {
