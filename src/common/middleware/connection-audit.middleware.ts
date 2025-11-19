@@ -1,9 +1,8 @@
 import { Injectable, NestMiddleware, ForbiddenException } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { Model } from 'mongoose';
-import { SecurityAlert } from 'src/analytics/entities/security-alert.entity';
-import { ConnectionLog } from 'src/analytics/entities/connection-log.entity';
 import { InjectModel } from '@nestjs/mongoose';
+import { ConnectionLog, SecurityAlert } from '../../analytics/entities';
 
 @Injectable()
 export class ConnectionAuditMiddleware implements NestMiddleware {
