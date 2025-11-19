@@ -4,9 +4,16 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
+
   app.enableCors({
-    origin: 'https://dicasagroup.netlify.app',
+    origin: [
+      'https://dicasagroup.netlify.app',
+      'https://dicasagroup.com',
+      'https://www.dicasagroup.com',
+      'http://localhost:4200',
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
   });
 
   app.useGlobalPipes(
