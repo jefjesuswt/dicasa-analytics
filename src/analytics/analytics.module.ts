@@ -17,7 +17,7 @@ import {
   Visit,
   VisitSchema,
 } from './entities';
-import { ConnectionAuditMiddleware } from 'src/common/middleware/connection-audit.middleware';
+import { ConnectionAuditMiddleware } from '../common/middleware/connection-audit.middleware';
 
 @Module({
   imports: [
