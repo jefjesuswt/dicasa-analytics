@@ -15,6 +15,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         uri: configService.get<string>('DATABASE_URI'),
+        dbName: 'dicasa',
       }),
       inject: [ConfigService],
     }),
