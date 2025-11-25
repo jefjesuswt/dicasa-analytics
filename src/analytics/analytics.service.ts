@@ -7,6 +7,7 @@ import {
   AppointmentStatus,
   AuditLog,
   ConnectionLog,
+  Property,
   SecurityAlert,
   Session,
   Visit,
@@ -30,6 +31,8 @@ export class AnalyticsService {
     @InjectModel(AuditLog.name) private auditModel: Model<AuditLog>,
     @InjectModel(Appointment.name) private appointmentModel: Model<Appointment>,
     @InjectModel(SecurityAlert.name) private alertModel: Model<SecurityAlert>,
+    @InjectModel(Property.name) private propertyModel: Model<Property>,
+    @InjectModel(AuditLog.name) private auditLogModel: Model<AuditLog>,
     @InjectModel(ConnectionLog.name)
     private connectionLogModel: Model<ConnectionLog>,
   ) {}
@@ -232,5 +235,60 @@ export class AnalyticsService {
 
     const rate = (caCount / tsCount) * 100;
     return { rate: rate.toFixed(2), completed: caCount, total: tsCount };
+  }
+
+  async getDashboardStats() {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    const [
+      permanence,
+      cipher,
+      scheduling,
+      activeUsers,
+      totalVisits,
+      totalProperties,
+      inventoryStats,
+      recentLogs,
+    ] = await Promise.all([
+      this.getPermanenceMetrics(),
+      this.getCipherMetrics(),
+      this.getSchedulingRate(),
+      this.sessionModel.countDocuments({
+        lastSeenAt: { $gte: fiveMinutesAgo },
+      }),
+      this.visitModel.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }),
+      this.propertyModel.countDocuments({}),
+      this.propertyModel.aggregate([
+        { $group: { _id: '$status', count: { $sum: 1 } } },
+      ]),
+      this.auditLogModel
+        .find()
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .select('action userId createdAt details'),
+    ]);
+
+    return {
+      kpis: {
+        activeUsers,
+        totalVisitsMonth: totalVisits,
+        avgPermanence: Math.round(permanence.averagePermanence_PM),
+        schedulingRate: scheduling.rate,
+        cipherCompliance: cipher.porcentaje_cumplimiento,
+        totalProperties,
+      },
+      charts: {
+        inventory: inventoryStats,
+        schedulingFunnel: {
+          total: scheduling.total,
+          completed: scheduling.completed,
+        },
+      },
+      security: {
+        recentLogs,
+        alertsCount: cipher.peticiones_no_cifradas_http,
+      },
+    };
   }
 }

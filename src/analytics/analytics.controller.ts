@@ -21,6 +21,11 @@ import { Visit } from './entities';
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
+  @Get('dashboard')
+  getDashboardStats() {
+    return this.analyticsService.getDashboardStats();
+  }
+
   // VISITAS
 
   @Post('visit')
